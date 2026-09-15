@@ -14,7 +14,6 @@ let incidents = [];
 let incidentCounter = 1;
 let latencyChart;
 let availabilityChart;
-let autoTimer;
 
 const els = {
   serviceSelect: document.getElementById("serviceSelect"),
@@ -296,6 +295,3 @@ document.getElementById("resetBtn").addEventListener("click", () => {
 initSelect();
 resetState();
 
-autoTimer = window.setInterval(() => {
-  runCycle();
-}, 7000);
