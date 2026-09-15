@@ -34,7 +34,7 @@ https://billalhossainshishir.github.io/network-monitoring-incident-system/
 
 The root `index.html` and `assets/` directory contain a browser-only simulation of the same incident lifecycle.
 
-The demo is intentionally static so it can open instantly on GitHub Pages without a hosted Python server, PostgreSQL database or recruiter login.
+The demo is intentionally static so it can open instantly on GitHub Pages without a hosted Python server, PostgreSQL database or recruiter login. The guided public demo uses manual health checks so the three-failure incident threshold is deterministic and easy to follow.
 
 > **Transparency:** the GitHub Pages demo simulates the monitoring workflow in JavaScript. It is not presented as a deployed FastAPI/PostgreSQL backend. The full server-side implementation is included in this repository and can be run locally.
 
