@@ -2,6 +2,10 @@ fastapi==0.116.1
 uvicorn[standard]==0.35.0
 SQLAlchemy==2.0.43
 psycopg[binary]==3.3.5
+<<<<<<< HEAD
 pydantic==2.11.7
+=======
+pydantic==2.13.5
+>>>>>>> a6016dcef1953635f3881c6435d9c699a7cea5d2
 pytest==8.4.1
 httpx==0.28.1
