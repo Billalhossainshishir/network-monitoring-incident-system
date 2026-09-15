@@ -8,6 +8,7 @@ if TEST_DB.exists():
 os.environ["DATABASE_URL"] = f"sqlite:///{TEST_DB}"
 os.environ["DISABLE_BACKGROUND_MONITOR"] = "true"
 os.environ["FAILURE_THRESHOLD"] = "3"
+os.environ["HELPDESK_INTEGRATION_ENABLED"] = "false"
 
 from fastapi.testclient import TestClient
 
@@ -20,6 +21,32 @@ def test_health_and_seeded_services():
         services = client.get("/api/services").json()
         assert len(services) == 5
         assert {s["slug"] for s in services} == {"web", "api", "database", "auth", "file"}
+
+
+def test_simulated_service_health_endpoint_changes_status():
+    with TestClient(app) as client:
+        client.post("/api/reset")
+
+        online = client.get("/services/api/health")
+        assert online.status_code == 200
+        assert online.json()["status"] == "ONLINE"
+
+        client.post("/api/services/api/simulate-failure")
+        offline = client.get("/services/api/health")
+        assert offline.status_code == 503
+        assert offline.json()["status"] == "OFFLINE"
+
+
+def test_no_incident_before_failure_threshold():
+    with TestClient(app) as client:
+        client.post("/api/reset")
+        client.post("/api/services/api/simulate-failure")
+
+        client.post("/api/monitor/run-check")
+        assert client.get("/api/incidents?status=ACTIVE").json() == []
+
+        client.post("/api/monitor/run-check")
+        assert client.get("/api/incidents?status=ACTIVE").json() == []
 
 
 def test_three_failures_create_incident_and_restore_resolves_it():
@@ -46,6 +73,54 @@ def test_three_failures_create_incident_and_restore_resolves_it():
         assert api_resolved[0]["duration_seconds"] is not None
 
 
+def test_continued_failures_do_not_create_duplicate_active_incidents():
+    with TestClient(app) as client:
+        client.post("/api/reset")
+        client.post("/api/services/database/simulate-failure")
+
+        for _ in range(6):
+            client.post("/api/monitor/run-check")
+
+        active = client.get("/api/incidents?status=ACTIVE").json()
+        database_incidents = [i for i in active if i["service_slug"] == "database"]
+        assert len(database_incidents) == 1
+
+
+def test_incident_event_timeline_contains_creation_and_recovery():
+    with TestClient(app) as client:
+        client.post("/api/reset")
+        client.post("/api/services/auth/simulate-failure")
+
+        for _ in range(3):
+            client.post("/api/monitor/run-check")
+
+        incident = [
+            i for i in client.get("/api/incidents?status=ACTIVE").json()
+            if i["service_slug"] == "auth"
+        ][0]
+
+        events = client.get(f"/api/incidents/{incident['id']}/events").json()
+        assert any(event["event_type"] == "CREATED" for event in events)
+
+        client.post("/api/services/auth/restore")
+
+        events = client.get(f"/api/incidents/{incident['id']}/events").json()
+        assert any(event["event_type"] == "RECOVERY" for event in events)
+
+
+def test_dashboard_returns_expected_sections():
+    with TestClient(app) as client:
+        client.post("/api/reset")
+        client.post("/api/monitor/run-check")
+
+        response = client.get("/api/dashboard")
+        assert response.status_code == 200
+
+        body = response.json()
+        assert {"generated_at", "summary", "services", "incidents", "recent_checks"}.issubset(body)
+        assert len(body["services"]) == 5
+
+
 def test_metrics_return_operational_fields():
     with TestClient(app) as client:
         client.post("/api/reset")
@@ -62,6 +137,25 @@ def test_metrics_return_operational_fields():
             "last_successful_check",
         }
         assert expected.issubset(row)
+
+
+def test_reset_clears_incidents_and_restores_services():
+    with TestClient(app) as client:
+        client.post("/api/reset")
+        client.post("/api/services/file/simulate-failure")
+        for _ in range(3):
+            client.post("/api/monitor/run-check")
+
+        assert client.get("/api/incidents").json()
+
+        reset = client.post("/api/reset")
+        assert reset.status_code == 200
+        assert client.get("/api/incidents").json() == []
+        assert client.get("/api/checks").json() == []
+
+        services = client.get("/api/services").json()
+        assert all(service["simulated_online"] for service in services)
+        assert all(service["failure_streak"] == 0 for service in services)
 
 
 def teardown_module():
