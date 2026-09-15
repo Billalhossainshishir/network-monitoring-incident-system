@@ -48,8 +48,8 @@ The failure threshold is configurable using `FAILURE_THRESHOLD` and defaults to 
 git clone https://github.com/Billalhossainshishir/network-monitoring-incident-system.git
 cd network-monitoring-incident-system
 python -m venv .venv
-pip install -r requirements.txt
-uvicorn backend.app.main:app --reload --port 8000
+python -m pip install -r requirements.txt
+python -m uvicorn backend.app.main:app --reload --port 8000
 ```
 
 In a second terminal:
