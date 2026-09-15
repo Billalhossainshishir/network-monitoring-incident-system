@@ -436,3 +436,75 @@ footer {
   .section-title { flex-direction: column; }
   footer { flex-direction: column; }
 }
+
+
+/* Mobile containment: keep charts and wide tables inside the viewport. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+main,
+.hero,
+.demo-shell,
+.panel,
+.chart-grid,
+.chart-panel,
+.table-wrap,
+.engineering-section {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.chart-grid > *,
+.summary-grid > *,
+.service-grid > *,
+.proof-grid > * {
+  min-width: 0;
+}
+
+.chart-panel {
+  overflow: hidden;
+}
+
+.chart-panel canvas {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 260px !important;
+}
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-wrap table {
+  min-width: 680px;
+}
+
+@media (max-width: 620px) {
+  .demo-shell {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .panel {
+    padding: 15px;
+  }
+
+  .chart-panel {
+    min-height: 0;
+  }
+
+  .chart-panel canvas {
+    height: 230px !important;
+  }
+
+  .table-wrap {
+    margin-inline: 0;
+  }
+}
