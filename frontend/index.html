@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Network Monitoring & Incident System</title>
+  <link rel="stylesheet" href="css/app.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">PORTFOLIO PROJECT 3</p>
+      <h1>Network Monitoring & Incident System</h1>
+      <p class="subtitle">Simulated infrastructure monitoring with automatic incident lifecycle management.</p>
+    </div>
+    <div class="status-pill" id="apiStatus">Checking API…</div>
+  </header>
+
+  <main>
+    <section class="controls panel">
+      <div>
+        <h2>Demo Controls</h2>
+        <p>Trigger a service outage, run health checks, then restore the service to see automatic recovery.</p>
+      </div>
+
+      <div class="control-row">
+        <select id="serviceSelect" aria-label="Choose service"></select>
+        <button id="failureBtn" class="danger">Simulate Failure</button>
+        <button id="checkBtn">Run Check</button>
+        <button id="restoreBtn" class="success">Restore Service</button>
+        <button id="resetBtn" class="secondary">Reset Incidents</button>
+      </div>
+
+      <p class="hint">Incident rule: 3 consecutive failures are required before an incident is created.</p>
+      <div id="message" class="message" aria-live="polite"></div>
+    </section>
+
+    <section class="summary-grid" id="summaryGrid"></section>
+
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <h2>Service Health</h2>
+          <p>Current operational state, latency and consecutive-failure count.</p>
+        </div>
+      </div>
+      <div class="service-grid" id="serviceGrid"></div>
+    </section>
+
+    <section class="charts-grid">
+      <div class="panel chart-panel">
+        <h2>Latency History</h2>
+        <canvas id="latencyChart"></canvas>
+      </div>
+      <div class="panel chart-panel">
+        <h2>Availability Snapshot</h2>
+        <canvas id="availabilityChart"></canvas>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <h2>Incident Lifecycle</h2>
+          <p>Repeated failures create incidents; recovery resolves them automatically.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Incident</th>
+              <th>Service</th>
+              <th>Status</th>
+              <th>Opened</th>
+              <th>Resolved</th>
+              <th>Duration</th>
+            </tr>
+          </thead>
+          <tbody id="incidentTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <h2>Recent Monitoring Logs</h2>
+          <p>Latest automated or manually triggered health checks.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Service</th>
+              <th>State</th>
+              <th>HTTP</th>
+              <th>Latency</th>
+            </tr>
+          </thead>
+          <tbody id="checksTable"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Built as a recruiter-facing portfolio project. Simulated infrastructure only; no external systems are affected.
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
