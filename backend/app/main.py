@@ -58,7 +58,7 @@ def root():
         "project": "Network Monitoring & Incident System",
         "status": "ready",
         "docs": "/docs",
-        "note": "Frontend is intentionally not deployed yet. Test locally before publishing.",
+        "note": "The public GitHub Pages site is a browser-only portfolio demo. This API is the full backend implementation.",
     }
 
 
