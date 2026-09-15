@@ -1,27 +1,59 @@
 # Network Monitoring & Incident System
 
-A recruiter-facing portfolio project that demonstrates **IT support, infrastructure monitoring, backend APIs, operational metrics and incident automation**.
+A recruiter-facing portfolio project that demonstrates **IT operations, infrastructure monitoring, backend APIs, incident automation, operational metrics and service-to-service integration**.
 
-The system monitors five simulated services, records availability and latency, waits for repeated failures before creating an incident, and resolves the incident automatically when the service recovers.
+The project monitors five simulated services, records availability and latency, waits for repeated failures before creating an incident, resolves the incident automatically when the service recovers, and visualises the operational state through a dashboard.
 
-> **Deployment status:** intentionally **not live yet**. The project is being tested locally before public deployment.
+## Portfolio strategy
+
+This repository intentionally contains **two experiences**.
+
+### 1. Full engineering project
+
+The repository contains the actual backend implementation:
+
+- Python + FastAPI
+- SQLAlchemy data model
+- SQLite for low-friction local testing
+- PostgreSQL-ready Docker Compose stack
+- configurable background monitoring worker
+- three-consecutive-failure incident logic
+- automatic recovery and incident resolution
+- incident event timeline
+- operational metrics
+- backend-connected HTML/CSS/JavaScript dashboard
+- optional AI Helpdesk Copilot integration
+- automated pytest suite
+- GitHub Actions CI
+- architecture, API, testing and case-study documentation
+
+### 2. Instant recruiter demo
+
+**GitHub Pages target URL:**  
+https://billalhossainshishir.github.io/network-monitoring-incident-system/
+
+The root `index.html` and `assets/` directory contain a browser-only simulation of the same incident lifecycle.
+
+The demo is intentionally static so it can open instantly on GitHub Pages without a hosted Python server, PostgreSQL database or recruiter login.
+
+> **Transparency:** the GitHub Pages demo simulates the monitoring workflow in JavaScript. It is not presented as a deployed FastAPI/PostgreSQL backend. The full server-side implementation is included in this repository and can be run locally.
 
 ## Recruiter demo flow
 
-**Services online → health checks run → simulate outage → repeated failures → incident created → restore service → incident resolved**
+```text
+Services online
+→ Simulate Failure
+→ Check 1 fails
+→ Check 2 fails
+→ Check 3 fails
+→ ACTIVE incident created
+→ Restore Service
+→ recovery check succeeds
+→ incident RESOLVED
+→ duration recorded
+```
 
-## What this project proves
-
-- Service health checking and latency tracking
-- Repeated-failure logic to reduce alert noise
-- Automatic incident creation and recovery
-- Uptime and latency metrics
-- Incident history and monitoring logs
-- FastAPI backend design
-- Relational data modelling with SQLAlchemy
-- PostgreSQL-ready configuration
-- Automated tests
-- Recruiter-friendly dashboard
+The main interaction can be understood in approximately 30–60 seconds.
 
 ## Monitored services
 
@@ -31,102 +63,366 @@ The system monitors five simulated services, records availability and latency, w
 - Authentication Service
 - File Service
 
-All targets are simulated, so the demo never interferes with third-party infrastructure.
+All services are simulated for safe portfolio testing.
 
-## Incident logic
+## Why three consecutive failures?
+
+Creating an incident on the first failed check can create alert noise.
+
+This project uses a configurable threshold:
 
 ```text
-Check 1 failed → Check 2 failed → Check 3 failed → Incident created
-Service recovers → Recovery check succeeds → Incident automatically resolved
+Failure 1 → monitoring event only
+Failure 2 → monitoring event only
+Failure 3 → confirmed outage → incident created
 ```
 
-The failure threshold is configurable using `FAILURE_THRESHOLD` and defaults to `3`.
+Default:
 
-## Local setup
+```text
+FAILURE_THRESHOLD=3
+```
 
-```bash
-git clone https://github.com/Billalhossainshishir/network-monitoring-incident-system.git
-cd network-monitoring-incident-system
+## Automatic recovery
+
+When an offline service returns online:
+
+```text
+successful recovery check
+→ active incident found
+→ incident status = RESOLVED
+→ resolved_at stored
+→ outage duration calculated
+→ RECOVERY event added
+```
+
+## Architecture
+
+### Full implementation
+
+```text
+Simulated services
+        ↓
+Background monitoring worker
+        ↓
+Health / latency observations
+        ↓
+monitoring_checks
+        ↓
+Consecutive-failure engine
+        ├── below threshold → keep monitoring
+        └── threshold reached → ACTIVE incident
+                                  ↓
+                            incident_events
+                                  ↓
+                       optional Helpdesk API
+
+Service recovers
+        ↓
+successful check
+        ↓
+incident RESOLVED
+        ↓
+duration + recovery event
+        ↓
+FastAPI dashboard / metrics API
+        ↓
+backend-connected frontend
+```
+
+### GitHub Pages demo
+
+```text
+Browser service simulator
+        ↓
+JavaScript health checks
+        ↓
+in-memory logs
+        ↓
+same 3-failure business rule
+        ↓
+incident + recovery simulation
+        ↓
+Chart.js dashboard
+```
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+## Repository structure
+
+```text
+.
+├── index.html                     # GitHub Pages recruiter demo
+├── assets/
+│   ├── css/style.css
+│   └── js/app.js
+│
+├── backend/
+│   ├── Dockerfile
+│   ├── run.py
+│   └── app/
+│       ├── main.py
+│       ├── config.py
+│       ├── db.py
+│       ├── models.py
+│       ├── schemas.py
+│       ├── api/
+│       │   └── routes.py
+│       └── services/
+│           ├── monitor.py
+│           └── helpdesk.py
+│
+├── frontend/                      # Real FastAPI-connected frontend
+│   ├── index.html
+│   ├── css/app.css
+│   └── js/app.js
+│
+├── tests/
+│   └── test_api.py
+│
+├── docs/
+│   ├── ARCHITECTURE.md
+│   ├── API.md
+│   ├── TESTING.md
+│   └── CASE_STUDY.md
+│
+├── .github/workflows/tests.yml
+├── .env.example
+├── .dockerignore
+├── .gitignore
+├── .nojekyll
+├── docker-compose.yml
+├── pytest.ini
+└── requirements.txt
+```
+
+## Database model
+
+### `monitored_services`
+
+Stores:
+
+- service slug
+- display name
+- description
+- simulated online/offline state
+- current consecutive-failure count
+
+### `monitoring_checks`
+
+Stores:
+
+- service
+- timestamp
+- ONLINE / OFFLINE status
+- response latency
+- HTTP result
+
+### `incidents`
+
+Stores:
+
+- incident number
+- service
+- ACTIVE / RESOLVED state
+- opened timestamp
+- resolved timestamp
+- duration
+- trigger reason
+
+### `incident_events`
+
+Stores an auditable lifecycle timeline:
+
+- incident created
+- additional failed check
+- recovery
+- optional Helpdesk integration result
+
+## Operational metrics
+
+The backend calculates per-service:
+
+- uptime percentage
+- average latency
+- maximum latency
+- outage count
+- longest outage
+- last successful check
+- incident count
+
+The dashboard also presents:
+
+- online services
+- offline services
+- active incidents
+- recent average latency
+- recent monitoring logs
+- incident history
+
+## Main API endpoints
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/health` | application health |
+| `GET` | `/api/services` | monitored services |
+| `GET` | `/services/{slug}/health` | simulated target health |
+| `POST` | `/api/services/{slug}/simulate-failure` | trigger outage |
+| `POST` | `/api/services/{slug}/restore` | restore and recover |
+| `POST` | `/api/monitor/run-check` | execute monitoring cycle |
+| `GET` | `/api/checks` | monitoring history |
+| `GET` | `/api/incidents` | incident history |
+| `GET` | `/api/incidents/{id}/events` | incident timeline |
+| `GET` | `/api/metrics` | operational metrics |
+| `GET` | `/api/dashboard` | combined dashboard data |
+| `POST` | `/api/reset` | reset demo data |
+
+Detailed API documentation: [docs/API.md](docs/API.md)
+
+## Run locally — Python
+
+Python 3.14 is supported by the pinned project dependencies.
+
+```powershell
 python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 python -m uvicorn backend.app.main:app --reload --port 8000
 ```
 
+Open:
+
+```text
+API root:     http://127.0.0.1:8000
+Swagger docs: http://127.0.0.1:8000/docs
+```
+
 In a second terminal:
 
-```bash
+```powershell
 cd frontend
 python -m http.server 5500
 ```
 
-Open `http://127.0.0.1:5500`.
+Open:
 
-## How to test the main incident workflow
+```text
+http://127.0.0.1:5500
+```
 
-1. Open the dashboard.
-2. Choose **API Server**.
-3. Click **Simulate Failure**.
-4. Click **Run Check** three times.
-5. Confirm the API Server becomes OFFLINE and an ACTIVE incident appears.
-6. Click **Restore Service**.
-7. Confirm the incident changes to RESOLVED and a duration is recorded.
-8. Click **Reset Incidents** to return to the clean demo state.
+## Local test flow
 
-The background monitor also runs automatically every two seconds unless disabled in configuration.
+1. Start the backend.
+2. Start the frontend.
+3. Select **API Server**.
+4. Click **Simulate Failure**.
+5. Run three health checks.
+6. Confirm an ACTIVE incident appears.
+7. Click **Restore Service**.
+8. Confirm the incident becomes RESOLVED.
+9. Inspect latency, monitoring logs and incident history.
 
-## Core API endpoints
+## Run with Docker + PostgreSQL
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/health` | Application health |
-| GET | `/api/services` | List monitored services |
-| GET | `/services/{slug}/health` | Simulated target health endpoint |
-| POST | `/api/services/{slug}/simulate-failure` | Force a simulated outage |
-| POST | `/api/services/{slug}/restore` | Restore service and trigger recovery |
-| POST | `/api/monitor/run-check` | Run a full monitoring cycle |
-| GET | `/api/checks` | Monitoring history |
-| GET | `/api/incidents` | Incident history |
-| GET | `/api/incidents/{id}/events` | Incident lifecycle events |
-| GET | `/api/metrics` | Uptime, latency and outage metrics |
-| GET | `/api/dashboard` | Combined dashboard payload |
-| POST | `/api/reset` | Reset demo data |
+Requirements:
 
-## Database
+- Docker Desktop / Docker Engine
+- Docker Compose
 
-SQLite is used by default for quick local testing. The data layer is PostgreSQL-ready for later deployment.
+Run:
 
-Core tables:
+```bash
+docker compose up --build
+```
 
-- `monitored_services`
-- `monitoring_checks`
-- `incidents`
-- `incident_events`
+The full Docker stack uses PostgreSQL rather than the default local SQLite database.
 
-## Automated tests
+Stop:
+
+```bash
+docker compose down
+```
+
+Remove the database volume:
+
+```bash
+docker compose down -v
+```
+
+## Automated testing
+
+Run:
 
 ```bash
 pytest -q
 ```
 
-Tests cover the seeded services, three-failure incident rule, automatic recovery and operational metrics.
+The suite covers:
 
-## Architecture
+- application health
+- five seeded services
+- simulated service-health status
+- no incident before the threshold
+- incident creation on the third failure
+- no duplicate ACTIVE incident during continued outage
+- incident event timeline
+- automatic recovery
+- dashboard response shape
+- operational metrics
+- reset behaviour
 
-See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+GitHub Actions runs the tests automatically on pushes and pull requests.
 
-## Planned later enhancement
+See [docs/TESTING.md](docs/TESTING.md).
 
-After the standalone monitor is validated, it can call the **AI Helpdesk Copilot** API when an incident is created:
+## Optional Project 1 integration
+
+The project can connect to the **AI Helpdesk Copilot**.
+
+Flow:
 
 ```text
-Network monitor detects outage
+Network monitor confirms outage
 → incident created
-→ Helpdesk API called
+→ Helpdesk /tickets API called
 → support ticket created automatically
 ```
 
-That integration is intentionally not required for the first Project 3 test build.
+Enable:
 
-## CV / portfolio description
+```text
+HELPDESK_INTEGRATION_ENABLED=true
+HELPDESK_API_URL=http://127.0.0.1:8001
+```
 
-Built a Python-based network/service monitoring platform that records uptime and latency, applies repeated-failure logic, creates and resolves incidents automatically, and visualises operational health through a live dashboard.
+The integration is failure-safe. If the Helpdesk API is unavailable, the monitoring platform continues running and records a `HELPDESK_SYNC_FAILED` incident event.
+
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [API Reference](docs/API.md)
+- [Testing Strategy](docs/TESTING.md)
+- [Case Study](docs/CASE_STUDY.md)
+
+## Case study
+
+Read [docs/CASE_STUDY.md](docs/CASE_STUDY.md) for the problem, engineering decisions and recruiter-facing explanation.
+
+## CV / portfolio wording
+
+**Network Monitoring & Incident System — Sep 2026**  
+Built a Python/FastAPI service-monitoring platform that records uptime and latency, applies configurable repeated-failure logic to reduce alert noise, creates and resolves incidents automatically, stores lifecycle events and operational metrics, supports PostgreSQL/Docker deployment, integrates optionally with an AI Helpdesk API, and includes an interactive GitHub Pages recruiter demo.
+
+## Design decision: why the live demo is separate
+
+A public portfolio link should open quickly and remain reliable.
+
+GitHub Pages provides that experience but cannot execute Python/FastAPI or host PostgreSQL.
+
+Instead of pretending that a static page is a deployed backend:
+
+- **GitHub Pages** demonstrates the product behaviour interactively.
+- **The repository** proves the actual engineering implementation.
+
+That separation is intentional, transparent and documented.
