@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Network Monitoring & Incident System</title>
+  <meta name="description" content="Interactive browser demo of a network monitoring and incident automation platform.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="demo-banner">
+    <strong>Interactive Portfolio Demo</strong>
+    <span>Browser simulation of the full engineering system. No external infrastructure is affected.</span>
+  </div>
+
+  <header class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">PORTFOLIO PROJECT 3 · IT OPERATIONS / INFRASTRUCTURE</p>
+      <h1>Network Monitoring & Incident System</h1>
+      <p class="hero-text">
+        Watch simulated services, trigger an outage, see repeated failures create an incident automatically,
+        then restore the service and watch the incident resolve.
+      </p>
+      <div class="hero-actions">
+        <a class="button primary" href="#demo">Try the Live Demo</a>
+        <a class="button ghost" href="https://github.com/Billalhossainshishir/network-monitoring-incident-system" target="_blank" rel="noreferrer">View Full GitHub Project</a>
+      </div>
+    </div>
+
+    <div class="architecture-card">
+      <div class="arch-node">Services</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node">Health Checks + Latency</div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node split">
+        <span>Success → Metrics</span>
+        <span>3 Failures → Incident</span>
+      </div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node">Recovery → Auto Resolve</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="proof-grid">
+      <article>
+        <span class="proof-number">01</span>
+        <h2>Monitoring</h2>
+        <p>Five simulated services generate availability, HTTP status and latency observations.</p>
+      </article>
+      <article>
+        <span class="proof-number">02</span>
+        <h2>Noise Reduction</h2>
+        <p>An incident is created only after three consecutive failures instead of the first failed check.</p>
+      </article>
+      <article>
+        <span class="proof-number">03</span>
+        <h2>Incident Lifecycle</h2>
+        <p>Outages create incidents automatically and recovery closes them with recorded duration.</p>
+      </article>
+      <article>
+        <span class="proof-number">04</span>
+        <h2>Operational Metrics</h2>
+        <p>Uptime, average latency, outage count, failure streaks and monitoring history remain visible.</p>
+      </article>
+    </section>
+
+    <section class="demo-shell" id="demo">
+      <div class="section-title">
+        <div>
+          <p class="eyebrow">RECRUITER DEMO</p>
+          <h2>Simulate an outage in under 30 seconds</h2>
+        </div>
+        <span class="mode-badge">STATIC DEMO MODE</span>
+      </div>
+
+      <div class="controls">
+        <label>
+          Service
+          <select id="serviceSelect"></select>
+        </label>
+        <button id="failureBtn" class="danger">Simulate Failure</button>
+        <button id="checkBtn">Run Health Check</button>
+        <button id="restoreBtn" class="success">Restore Service</button>
+        <button id="resetBtn" class="secondary">Reset Demo</button>
+      </div>
+
+      <div class="instruction-strip">
+        <strong>Recommended flow:</strong>
+        <span>Simulate Failure → Run Health Check 3× → Incident appears → Restore Service → Incident resolves</span>
+      </div>
+
+      <div id="message" class="message" aria-live="polite"></div>
+
+      <div class="summary-grid" id="summaryGrid"></div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h3>Service Health</h3>
+            <p>Live browser simulation of status, latency and consecutive failure state.</p>
+          </div>
+        </div>
+        <div class="service-grid" id="serviceGrid"></div>
+      </div>
+
+      <div class="chart-grid">
+        <div class="panel chart-panel">
+          <div class="panel-head">
+            <div>
+              <h3>Latency History</h3>
+              <p>Recent simulated response times across monitored services.</p>
+            </div>
+          </div>
+          <canvas id="latencyChart"></canvas>
+        </div>
+
+        <div class="panel chart-panel">
+          <div class="panel-head">
+            <div>
+              <h3>Availability Snapshot</h3>
+              <p>Current online/offline service distribution.</p>
+            </div>
+          </div>
+          <canvas id="availabilityChart"></canvas>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h3>Incident History</h3>
+            <p>Incidents appear only after the configured failure threshold is reached.</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Incident</th>
+                <th>Service</th>
+                <th>Status</th>
+                <th>Opened</th>
+                <th>Resolved</th>
+                <th>Duration</th>
+              </tr>
+            </thead>
+            <tbody id="incidentTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h3>Monitoring Logs</h3>
+            <p>Each health check records state, HTTP result and latency.</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Service</th>
+                <th>State</th>
+                <th>HTTP</th>
+                <th>Latency</th>
+              </tr>
+            </thead>
+            <tbody id="checksTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="engineering-section">
+      <div>
+        <p class="eyebrow">FULL ENGINEERING IMPLEMENTATION</p>
+        <h2>The GitHub repository contains the real backend project</h2>
+        <p>
+          This live page intentionally runs in the browser so it opens instantly on GitHub Pages.
+          The repository contains the actual FastAPI backend, SQLAlchemy data model, SQLite/PostgreSQL
+          configuration, Docker Compose stack, background monitoring worker, automated tests,
+          API documentation and optional AI Helpdesk Copilot integration.
+        </p>
+      </div>
+
+      <div class="stack-list">
+        <span>Python</span>
+        <span>FastAPI</span>
+        <span>SQLAlchemy</span>
+        <span>PostgreSQL</span>
+        <span>Docker</span>
+        <span>pytest</span>
+        <span>Chart.js</span>
+        <span>GitHub Actions</span>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Built by Billal Hossain Shishir as a recruiter-facing portfolio project.</p>
+    <p>Static demo data only · Full implementation available on GitHub.</p>
+  </footer>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
