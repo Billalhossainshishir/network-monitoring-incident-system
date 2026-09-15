@@ -1,0 +1,194 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #e8eef7;
+  background: #07111f;
+  line-height: 1.5;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #10233c 0, #07111f 42%, #050b14 100%);
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-start;
+  padding: 42px max(24px, calc((100vw - 1180px) / 2));
+  border-bottom: 1px solid #1c3048;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: #7dd3fc;
+  font-weight: 800;
+  letter-spacing: .16em;
+  font-size: .78rem;
+}
+
+h1, h2, p { margin-top: 0; }
+h1 { margin-bottom: 8px; font-size: clamp(2rem, 4vw, 3.5rem); line-height: 1.05; }
+h2 { margin-bottom: 6px; }
+.subtitle, .panel p, footer { color: #93a6bd; }
+
+.status-pill {
+  white-space: nowrap;
+  padding: 9px 14px;
+  border: 1px solid #2b4666;
+  border-radius: 999px;
+  color: #cbd5e1;
+  background: #0b1a2d;
+}
+
+main {
+  width: min(1180px, calc(100% - 32px));
+  margin: 30px auto 60px;
+}
+
+.panel {
+  background: rgba(9, 22, 38, .9);
+  border: 1px solid #1f3650;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.18);
+}
+
+.controls { display: grid; gap: 16px; margin-bottom: 20px; }
+.control-row { display: flex; flex-wrap: wrap; gap: 10px; }
+
+select, button {
+  border: 1px solid #34516f;
+  border-radius: 10px;
+  padding: 11px 14px;
+  background: #10233c;
+  color: #edf5ff;
+  font: inherit;
+}
+
+select { min-width: 220px; }
+button { cursor: pointer; font-weight: 700; }
+button:hover { filter: brightness(1.12); }
+button.danger { background: #6b1e2f; border-color: #a63b52; }
+button.success { background: #174b3b; border-color: #2b8065; }
+button.secondary { background: #27364a; }
+.hint { margin-bottom: 0 !important; font-size: .9rem; }
+.message { min-height: 24px; color: #7dd3fc; font-weight: 650; }
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.metric {
+  background: #0a182a;
+  border: 1px solid #1f3650;
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.metric .label { color: #8ea3ba; font-size: .9rem; }
+.metric .value { font-size: 2rem; font-weight: 800; margin-top: 4px; }
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.service-card {
+  border: 1px solid #2b4666;
+  border-radius: 14px;
+  padding: 16px;
+  background: #0b1a2d;
+}
+
+.service-card.offline {
+  border-color: #9c3248;
+  background: #23111a;
+}
+
+.service-card h3 { margin: 0 0 4px; font-size: 1rem; }
+.service-card .state { font-size: .8rem; font-weight: 900; letter-spacing: .08em; }
+.state.online { color: #6ee7b7; }
+.state.offline { color: #fb7185; }
+
+.service-meta {
+  display: grid;
+  gap: 3px;
+  margin-top: 12px;
+  color: #9fb0c5;
+  font-size: .84rem;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.chart-panel { min-height: 340px; }
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.table-wrap { overflow-x: auto; margin-top: 14px; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .9rem;
+}
+
+th, td {
+  padding: 12px 10px;
+  text-align: left;
+  border-bottom: 1px solid #1c3048;
+}
+
+th {
+  color: #8ea3ba;
+  font-size: .78rem;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: .76rem;
+  font-weight: 800;
+}
+
+.badge.active, .badge.offline { background: #542131; color: #fecdd3; }
+.badge.resolved, .badge.online { background: #153f35; color: #a7f3d0; }
+
+footer {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 0 0 36px;
+  font-size: .88rem;
+}
+
+@media (max-width: 900px) {
+  .summary-grid { grid-template-columns: repeat(2, 1fr); }
+  .service-grid { grid-template-columns: repeat(2, 1fr); }
+  .charts-grid { grid-template-columns: 1fr; }
+  .topbar { flex-direction: column; }
+}
+
+@media (max-width: 560px) {
+  .summary-grid, .service-grid { grid-template-columns: 1fr; }
+  .control-row > * { width: 100%; }
+}
