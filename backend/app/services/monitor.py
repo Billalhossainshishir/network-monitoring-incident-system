@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from ..config import FAILURE_THRESHOLD
 from ..models import Incident, IncidentEvent, MonitoredService, MonitoringCheck
+from .helpdesk import create_helpdesk_ticket
 
 
 def utc_now():
@@ -98,6 +99,26 @@ def perform_check(db: Session, service: MonitoredService) -> MonitoringCheck:
                     created_at=now,
                 )
             )
+
+            helpdesk_result = create_helpdesk_ticket(service, incident)
+            if helpdesk_result["status"] == "created":
+                db.add(
+                    IncidentEvent(
+                        incident_id=incident.id,
+                        event_type="HELPDESK_TICKET_CREATED",
+                        message=f"Helpdesk ticket created automatically: {helpdesk_result.get('ticket_number')}.",
+                        created_at=now,
+                    )
+                )
+            elif helpdesk_result["status"] == "failed":
+                db.add(
+                    IncidentEvent(
+                        incident_id=incident.id,
+                        event_type="HELPDESK_SYNC_FAILED",
+                        message=f"Helpdesk integration failed safely: {helpdesk_result.get('error')}.",
+                        created_at=now,
+                    )
+                )
         elif incident:
             db.add(
                 IncidentEvent(
