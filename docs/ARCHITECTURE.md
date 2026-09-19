@@ -137,3 +137,9 @@ Integration is optional and failure-safe.
 ## Safety
 
 The project uses simulated services rather than probing arbitrary third-party systems. This keeps the portfolio demo repeatable and avoids creating traffic against systems the project does not own.
+
+
+
+## Current execution boundary
+
+Backend checks read simulated state and generate latency values; they do not probe external network services. Compose provides the API and database only, with the backend-connected frontend served separately. See [the reviewer guide](REVIEWER_GUIDE.md) for metrics definitions, configuration and repeatable checks.

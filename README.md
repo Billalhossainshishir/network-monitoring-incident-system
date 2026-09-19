@@ -1,6 +1,8 @@
 # Network Monitoring & Incident System
 
-A recruiter-facing portfolio project that demonstrates **IT operations, infrastructure monitoring, backend APIs, incident automation, operational metrics and service-to-service integration**.
+An incident-management project for five simulated services. Repeated failures create one active incident; a successful check resolves it and records the recovery. The backend demonstrates the incident lifecycle using simulated observations rather than probing external servers.
+
+Read the [reviewer guide](docs/REVIEWER_GUIDE.md) for execution modes, reproducible setup, architecture, verification steps and known limitations.
 
 The project monitors five simulated services, records availability and latency, waits for repeated failures before creating an incident, resolves the incident automatically when the service recovers, and visualises the operational state through a dashboard.
 
@@ -336,7 +338,7 @@ Run:
 docker compose up --build
 ```
 
-The full Docker stack uses PostgreSQL rather than the default local SQLite database.
+The Docker stack runs the API and PostgreSQL. It does not serve the dashboard: run `python -m http.server 5500 --directory frontend` separately from the repository root and open http://127.0.0.1:5500.
 
 Stop:
 
@@ -389,7 +391,7 @@ Network monitor confirms outage
 → support ticket created automatically
 ```
 
-Enable:
+The Python process does not load `.env` automatically. Set these process environment variables before startup (see the reviewer guide for PowerShell commands):
 
 ```text
 HELPDESK_INTEGRATION_ENABLED=true
