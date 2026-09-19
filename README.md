@@ -1,8 +1,24 @@
 # Network Monitoring & Incident System
 
+[![Tests](https://github.com/Billalhossainshishir/network-monitoring-incident-system/actions/workflows/tests.yml/badge.svg)](https://github.com/Billalhossainshishir/network-monitoring-incident-system/actions/workflows/tests.yml)
+[![GitHub Pages](https://github.com/Billalhossainshishir/network-monitoring-incident-system/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/Billalhossainshishir/network-monitoring-incident-system/actions/workflows/deploy-pages.yml)
+
 An incident-management project for five simulated services. Repeated failures create one active incident; a successful check resolves it and records the recovery. The backend demonstrates the incident lifecycle using simulated observations rather than probing external servers.
 
 Read the [reviewer guide](docs/REVIEWER_GUIDE.md) for execution modes, reproducible setup, architecture, verification steps and known limitations.
+
+## Quick recruiter view
+
+| Explore | Link |
+| --- | --- |
+| **Live demo** | https://billalhossainshishir.github.io/network-monitoring-incident-system/ |
+| **Reviewer guide** | [docs/REVIEWER_GUIDE.md](docs/REVIEWER_GUIDE.md) |
+| **Architecture** | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
+| **API reference** | [docs/API.md](docs/API.md) |
+| **Testing** | [docs/TESTING.md](docs/TESTING.md) |
+| **Case study** | [docs/CASE_STUDY.md](docs/CASE_STUDY.md) |
+
+**60-second demo:** Simulate Failure → run three checks → confirm one ACTIVE incident → Restore Service → confirm RESOLVED status and recorded outage duration.
 
 The project monitors five simulated services, records availability and latency, waits for repeated failures before creating an incident, resolves the incident automatically when the service recovers, and visualises the operational state through a dashboard.
 
@@ -428,3 +444,11 @@ Instead of pretending that a static page is a deployed backend:
 - **The repository** proves the actual engineering implementation.
 
 That separation is intentional, transparent and documented.
+
+## Limitations and scope
+
+- The monitored services are simulated; the project does not probe real external production systems.
+- The GitHub Pages experience is a deterministic browser simulation, not the deployed FastAPI/PostgreSQL backend.
+- The three-consecutive-failure threshold is a configurable demonstration rule rather than a universal monitoring standard.
+- The optional AI Helpdesk integration is failure-safe and depends on a separately running Helpdesk API.
+- Production deployment would require authentication, alert routing, stronger observability, secrets management and infrastructure hardening.
