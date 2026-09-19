@@ -22,6 +22,11 @@ Read the [reviewer guide](docs/REVIEWER_GUIDE.md) for execution modes, reproduci
 
 The project monitors five simulated services, records availability and latency, waits for repeated failures before creating an incident, resolves the incident automatically when the service recovers, and visualises the operational state through a dashboard.
 
+
+## Project preview
+
+![Network Monitoring and Incident System live demo overview](screenshots/network-monitoring-overview.jpg)
+
 ## Portfolio strategy
 
 This repository intentionally contains **two experiences**.
